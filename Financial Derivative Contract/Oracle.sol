@@ -33,7 +33,7 @@ contract Oracle is usingProvable{
 
     /*Events*/
     event DocumentStored(uint _key, uint _value);
-    event newOraclizeQuery(string description);
+    event newProvableQuery(string description);
 
     /*Functions*/
     /*
@@ -69,15 +69,15 @@ contract Oracle is usingProvable{
         require(currentQuery.queried == false  && currentQuery.calledTime == 0 || 
             currentQuery.calledTime != 0 && _calledTime >= (currentQuery.calledTime + 3600) &&
             currentQuery.value == 0);
-        if (oraclize_getPrice("URL") > address(this).balance) {
-            emit newOraclizeQuery("Provable query was NOT sent, please add some ETH to cover for the query fee");
+        if (provable_getPrice("URL") > address(this).balance) {
+            emit newProvableQuery("Provable query was NOT sent, please add some ETH to cover for the query fee");
         } else {
-            emit newOraclizeQuery("Provable queries sent");
+            emit newProvableQuery("Provable queries sent");
             if (currentQuery.called == false){
-                queryID = oraclize_query("URL", API);
+                queryID = provable_query("URL", API);
                 usedAPI=API;
             } else if (currentQuery.called == true ){
-                queryID = oraclize_query("URL", API2);
+                queryID = provable_query("URL", API2);
                 usedAPI=API2;  
             }
 
@@ -102,7 +102,7 @@ contract Oracle is usingProvable{
     */
     function __callback(bytes32 _oraclizeID, string _result) public {
         QueryInfo storage currentQuery = info[_oraclizeID];
-        require(msg.sender == oraclize_cbAddress() && _oraclizeID == queryID);
+        require(msg.sender == provable_cbAddress() && _oraclizeID == queryID);
         currentQuery.value = parseInt(_result,3);
         currentQuery.called = false; 
         if(currentQuery.value == 0){
