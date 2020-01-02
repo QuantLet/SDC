@@ -10,7 +10,7 @@ Author: Raphael C. G. Reule
 
 Submitted: Thu, 2 January 2020
 
-Input:  Oracle data. Oracle data to SDC. Counterparty input to SDC.
+Input:  Oracle data. Oracle data to SDC. Counterparty input to SDC. State to Frontend.
 
 Output: Ethereum Solidity Contract Framework.
 
