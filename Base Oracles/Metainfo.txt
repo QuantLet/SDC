@@ -6,7 +6,7 @@ Description: Sample Oracles provided by Provable. https://provable.xyz/
 
 Keywords : Smart Contracts, Ethereum, CRIX, Financial Derivative, Option, Swap
 
-Author: Raphael C. G. Reule
+Author: Riccardo Persiani et al.
 
 Submitted: Thu, 2 January 2020
 
