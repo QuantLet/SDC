@@ -16,4 +16,4 @@ Output: Processing in the Ethereum Ecosystem.
 
 Example: Sample Oracles.
 
-Output:  Sample Oracles\cf2  Framework.
+Output:  Sample Oracles Framework.
