@@ -42,3 +42,7 @@ contract Factory {
     }
 }
 
+
+//Factory Value SC's
+// ETH/USD:0x4870a9da5999209e03a70f48ec4eca924d3f6fe2
+// BTC/USD:0xa9f6eabcc9da75ac320946506b98ca6bf76ce459
