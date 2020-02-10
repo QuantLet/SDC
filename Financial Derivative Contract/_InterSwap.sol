@@ -1,4 +1,6 @@
 
+//Auferstanden aus Ruinen und dem Intershop--swap zugewandt!
+
 pragma solidity ^0.6.1;
 //pragma solidity ^0.4.18;
 
@@ -177,8 +179,7 @@ contract InterSwap is Ownable{
 
     }
 
-    //https://www.euribor-rates.eu/en/current-euribor-rates/
-    //checkcheck _swap_rate = 2.88% based on forward rate of EURIBOR 1 month market expected in 23 months if 24 month contract (1st day of contract maturity month)
+    //checkcheck _swap_rate = 2.88% based on forward rate of US LIBOR 1 month market expected in 23 months if 24 month contract (1st day of contract maturity month)
     function mintInterSwap (uint _swap_rate) onlyOwner public {
         // InterSwapTerms memory int_swap_terms = contractAddressToContractTerms[address(this)];
         ProposalOwner memory proposal_owner = proposalAddressToProposalOwner[proposalOwner]; //this gives us the proposal owner struct
@@ -200,25 +201,25 @@ contract InterSwap is Ownable{
         contractAddressToContractTerms[address(this)] = interswap_terms;
     }
 
-    // function getEndEuribor(uint end_EURIBOR) internal hasMatured onlyOwner returns (uint){
+    // function getEndLibor(uint end_LIBOR) internal hasMatured onlyOwner returns (uint){
     //     //this function only called when contract is matured
-    //     //contact oracle (or array for demo) to get one-month EURIBOR at beginning of maturity month
+    //     //contact oracle (or array for demo) to get one-month LIBOR at beginning of maturity month
 
-    //     // uint end_EURIBOR = msg.data;
+    //     // uint end_LIBOR = msg.data;
 
-    //     return end_EURIBOR;
+    //     return end_LIBOR;
     // }
 
     //tst remove hasMatured modifier
-    function VarToFixedPayoutCalc(uint _end_EURIBOR) public onlyOwner returns (uint VarToFixedPayout){
-        //2.9% = 0.029 EURIBOR will be scaled to 29,000,000
-        //0.88% = 0.0088 scaled to 8,800,000 EURIBOR
-        //_end_EURIBOR to be passed into function = 29,000,000
+    function VarToFixedPayoutCalc(uint _end_LIBOR) public onlyOwner returns (uint VarToFixedPayout){
+        //2.9% = 0.029 LIBOR will be scaled to 29,000,000
+        //0.88% = 0.0088 scaled to 8,800,000 LIBOR
+        //_end_LIBOR to be passed into function = 29,000,000
         //swap rate will be scaled to 28,800,000 (2.88% = 0.0288)
         //cnotional amount = 100,000
 
-        //if EURIBOR increases (is positive) VarToFixed owner gets a profit
-        //if EURIBOR decreases (is negative) VarToFixed owner gets a loss
+        //if LIBOR increases (is positive) VarToFixed owner gets a profit
+        //if LIBOR decreases (is negative) VarToFixed owner gets a loss
         //divide rates by 120,000,000 (with 7 zeroes) to convert from annual to monthly and from integer to 7 decimal places
 
         ProposalOwner memory proposal_owner = proposalAddressToProposalOwner[proposalOwner];
@@ -226,8 +227,8 @@ contract InterSwap is Ownable{
 
         uint VarToFixedGain;
         uint VarToFixedLoss;
-        // uint end_EURIBOR = getEndEuribor();
-        uint end_EURIBOR = _end_EURIBOR;
+        // uint end_LIBOR = getEndLibor();
+        uint end_LIBOR = _end_LIBOR;
         uint _swap_rate = int_swap_terms.swap_rate;
         uint _notional_amount = proposal_owner.notional_amount;
         uint _escrow_amount;
@@ -245,13 +246,13 @@ contract InterSwap is Ownable{
         }
 
 
-        //when end_EURIBOR gone up experience gain
-        if (end_EURIBOR > _swap_rate){
-            VarToFixedGain = (_notional_amount.mul(end_EURIBOR.sub(_swap_rate))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER); //166.666
+        //when end_LIBOR gone up experience gain
+        if (end_LIBOR > _swap_rate){
+            VarToFixedGain = (_notional_amount.mul(end_LIBOR.sub(_swap_rate))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER); //166.666
         }
-        //when end_EURIBOR gone down experience loss
-        if (end_EURIBOR <= _swap_rate){
-            VarToFixedLoss = (_notional_amount.mul(_swap_rate.sub(end_EURIBOR))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER);
+        //when end_LIBOR gone down experience loss
+        if (end_LIBOR <= _swap_rate){
+            VarToFixedLoss = (_notional_amount.mul(_swap_rate.sub(end_LIBOR))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER);
         }
 
         //VarToFixedGain is limited by _escrow_amount
@@ -273,16 +274,16 @@ contract InterSwap is Ownable{
         return VarToFixedPayout;
     }
 
-    function FixedToVarPayoutCalc(uint _end_EURIBOR) public onlyOwner returns(uint FixedToVarPayout){
-        //if EURIBOR increases (is positive) FixedToVar owner gets loss
-        //if EURIBOR decreases (is negative) FixedToVar owner gets profit
+    function FixedToVarPayoutCalc(uint _end_LIBOR) public onlyOwner returns(uint FixedToVarPayout){
+        //if LIBOR increases (is positive) FixedToVar owner gets loss
+        //if LIBOR decreases (is negative) FixedToVar owner gets profit
         ProposalOwner memory proposal_owner = proposalAddressToProposalOwner[proposalOwner];
         InterSwapTerms memory int_swap_terms = contractAddressToContractTerms[address(this)]; //address(this) is the address of this contract
 
         uint FixedToVarGain;
         uint FixedToVarLoss;
-        // uint end_EURIBOR = getEndEURIBOR();
-        uint end_EURIBOR = _end_EURIBOR;
+        // uint end_LIBOR = getEndLibor();
+        uint end_LIBOR = _end_LIBOR;
         uint _swap_rate = int_swap_terms.swap_rate;
         uint _notional_amount = proposal_owner.notional_amount;
         uint _escrow_amount;
@@ -300,11 +301,11 @@ contract InterSwap is Ownable{
             fixedToVarOwner = counterparty;
         }
 
-        if (end_EURIBOR < _swap_rate){
-            FixedToVarGain = (_notional_amount.mul(_swap_rate.sub(end_EURIBOR))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER);
+        if (end_LIBOR < _swap_rate){
+            FixedToVarGain = (_notional_amount.mul(_swap_rate.sub(end_LIBOR))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER);
         }
-        if (end_EURIBOR >= _swap_rate){
-            FixedToVarLoss = (_notional_amount.mul(end_EURIBOR.sub(_swap_rate))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER);
+        if (end_LIBOR >= _swap_rate){
+            FixedToVarLoss = (_notional_amount.mul(end_LIBOR.sub(_swap_rate))).div(MONTHLY_INTEREST_RATE_SCALING_FACTOR_MULTIPLIER);
         }
         if (FixedToVarGain > _escrow_amount){
             FixedToVarGain = _escrow_amount;  //checkcheck replace value of FixedToVarGain variable or new name?
